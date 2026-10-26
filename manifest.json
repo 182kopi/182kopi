@@ -1,1 +1,17 @@
-{"name":"182KOPI POS V3","short_name":"182KOPI","start_url":"./index.html","display":"standalone","background_color":"#0f110e","theme_color":"#c7f167"}
+
+{
+  "name": "182KOPI V3 PRO",
+  "short_name": "182KOPI",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f110e",
+  "theme_color": "#c7f167",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzBmMTEwZSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTgwIiBmaWxsPSIjYzZmMTY3Ii8+PHRleHQgeD0iMjU2IiB5PSIyODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNzAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMwZjExMGU6Ij4xODI8L3RleHQ+PC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
