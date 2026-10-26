@@ -1,0 +1,111 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>182KOPI V3 PRO</title><style>
+:root{--g:#c7f167;--bg:#0f110e;--c:#1b1e19;--c2:#2a2f26;--t:#f5f0e8}*{box-sizing:border-box;font-family:system-ui}body{margin:0;background:var(--bg);color:var(--t)}header{padding:12px;background:#161a15;position:sticky;top:0;z-index:99;border-bottom:1px solid #2a2a2a;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;color:var(--g);font-size:20px} .logo b{color:#fff} .tabs{display:flex;gap:5px;overflow:auto;padding:8px;background:#121412}
+.tabs button{padding:7px 11px;border-radius:20px;border:1px solid #333;background:var(--c2);color:#fff;font-size:12px;white-space:nowrap}.tabs button.on{background:var(--g);color:#000;font-weight:700}
+main{padding:10px;max-width:1100px;margin:auto}.card{background:var(--c);border-radius:14px;padding:12px;margin-bottom:10px;border:1px solid #2a2a2a}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}.m{padding:10px;background:var(--c2);border-radius:10px;text-align:center;cursor:pointer;border:1px solid #333}.m:active{border-color:var(--g)}
+.btn{width:100%;padding:11px;border:0;border-radius:10px;font-weight:800;margin-top:6px}.g{background:var(--g);color:#000}.d{background:var(--c2);color:#fff;border:1px solid #444}
+input,select{width:100%;padding:9px;border-radius:8px;border:1px solid #444;background:var(--c2);color:#fff;margin:3px 0}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.kpi div{background:var(--c2);padding:8px;border-radius:10px;text-align:center}.kpi b{display:block;color:var(--g)}
+table{width:100%;font-size:12px;border-collapse:collapse} th,td{padding:5px;border-bottom:1px solid #2a2a2a;text-align:left}
+.progress{height:14px;background:#222;border-radius:10px;overflow:hidden;margin:6px 0}.bar{height:100%;background:var(--g)}
+.small{font-size:11px;opacity:.7}
+@media print{.tabs,header,.no-print{display:none} body{background:#fff;color:#000}}
+</style></head><body>
+<header><div class="logo">182<b>KOPI</b></div><div><select id="shift" onchange="gantiShift()" style="width:auto"><option>Owner</option><option>Andi Shift Pagi</option><option>Budi Shift Sore</option></select></div></header>
+<div class="tabs">
+<button onclick="p('kasir')" id="t-kasir" class="on">Kasir</button><button onclick="p('menu')" id="t-menu">Menu & Resep</button><button onclick="p('stok')" id="t-stok">Stok</button><button onclick="p('member')" id="t-member">Member</button><button onclick="p('hutang')" id="t-hutang">Bon</button><button onclick="p('keluar')" id="t-keluar">Keluar</button><button onclick="p('lap')" id="t-lap">Laporan</button><button onclick="p('qris')" id="t-qris">QRIS</button>
+</div>
+<main>
+<!-- KASIR -->
+<div id="kasir">
+<div class="card"><div class="kpi"><div><span class="small">Target Hari</span><b id="targetTxt">0 / 500k</b><div class="progress"><div id="targetBar" class="bar" style="width:0%"></div></div></div><div><span class="small">Shift</span><b id="shiftTxt">Owner</b></div><div><span class="small">Terlaris</span><b id="larisTxt">-</b></div><div><span class="small">Member Aktif</span><b id="memberTxt">0</b></div></div></div>
+<div class="grid2"><div class="card"><h3>Menu - Klik Jual</h3><div id="menuGrid" class="menu"></div></div>
+<div class="card"><h3>Keranjang</h3><div id="cart">Kosong</div><hr><div>Total: <b id="tot">Rp 0</b></div>
+<input id="bayar" type="number" placeholder="Bayar Tunai Rp"><input id="cust" placeholder="Nama pelanggan / member"><select id="metode"><option>Tunai</option><option>QRIS</option><option>Bon/Hutang</option><option>Member Gratis</option></select>
+<div id="kembali" class="small"></div>
+<button class="btn g" onclick="prosesBayar()">PROSES BAYAR + CETAK</button><button class="btn d no-print" onclick="cart=[];renderCart()">Kosongkan</button>
+<button class="btn d no-print" onclick="window.print()">Cetak Struk Manual (58mm)</button>
+<div id="struk" style="margin-top:10px;background:#fff;color:#000;padding:10px;border-radius:8px;font-size:12px;display:none"></div>
+</div></div></div>
+
+<!-- MENU & RESEP -->
+<div id="menu" style="display:none"><div class="card"><h3>Tambah Menu + Resep Otomatis</h3>
+<input id="mN" placeholder="Nama: Kopi Susu Aren"><input id="mH" type="number" placeholder="Harga jual"><input id="mM" type="number" placeholder="Modal">
+<input id="mR" placeholder="Resep: susu:150,gula_aren:20,es:100 (satuan ml/gr)">
+<button class="btn g" onclick="addMenu()">Simpan</button>
+<table><thead><tr><th>Menu</th><th>Harga</th><th>Resep</th><th>x</th></tr></thead><tbody id="tblMenu"></tbody></table></div></div>
+
+<!-- STOK -->
+<div id="stok" style="display:none"><div class="card"><h3>Stok Bahan - Otomatis kurang saat jualan</h3>
+<div class="grid2"><input id="sN" placeholder="Bahan: susu"><input id="sQ" type="number" placeholder="Jumlah"><input id="sS" placeholder="Satuan ml/gr"><button class="btn g" onclick="addStok()">Tambah</button></div>
+<table><thead><tr><th>Bahan</th><th>Sisa</th><th>Status</th><th>x</th></tr></thead><tbody id="tblStok"></tbody></table></div></div>
+
+<!-- MEMBER -->
+<div id="member" style="display:none"><div class="card"><h3>Member - Beli 10 Gratis 1</h3>
+<input id="memNama" placeholder="Nama member baru"><button class="btn g" onclick="addMember()">Daftar Member</button>
+<table><thead><tr><th>Nama</th><th>Poin</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tblMember"></tbody></table></div></div>
+
+<!-- HUTANG -->
+<div id="hutang" style="display:none"><div class="card"><h3>Bon / Hutang</h3><table><thead><tr><th>Waktu</th><th>Nama</th><th>Jumlah</th><th>Lunas?</th></tr></thead><tbody id="tblHutang"></tbody></table></div></div>
+
+<!-- KELUAR -->
+<div id="keluar" style="display:none"><div class="card"><h3>Pengeluaran</h3><input id="kN" placeholder="Beli es batu, bensin..."><input id="kB" type="number" placeholder="Rp"><button class="btn g" onclick="addKeluar()">Catat Keluar</button>
+<table><tbody id="tblKeluar"></tbody></table></div></div>
+
+<!-- LAPORAN -->
+<div id="lap" style="display:none"><div class="card"><h3>Laporan Lengkap</h3>
+<div class="kpi"><div><span class="small">Omzet</span><b id="lapOm">Rp 0</b></div><div><span class="small">Modal</span><b id="lapMod">Rp 0</b></div><div><span class="small">Keluar</span><b id="lapKel">Rp 0</b></div><div><span class="small">Laba Bersih</span><b id="lapLab">Rp 0</b></div></div>
+<canvas id="chart" width="320" height="150" style="background:#222;border-radius:10px;margin:8px 0"></canvas>
+<table><thead><tr><th>Waktu</th><th>Pelanggan</th><th>Metode</th><th>Total</th></tr></thead><tbody id="tblLap"></tbody></table>
+<div class="grid2"><button class="btn d" onclick="exportCSV()">Export Excel CSV</button><button class="btn d" onclick="if(confirm('Reset semua?')){localStorage.clear();location.reload()}">Reset Total</button></div>
+</div></div>
+
+<!-- QRIS -->
+<div id="qris" style="display:none"><div class="card"><h3>QRIS 182KOPI</h3><p class="small">Upload foto QRIS kamu, akan muncul di kasir saat pilih metode QRIS</p>
+<input type="file" id="qrisFile" accept="image/*"><div id="qrisPreview" style="text-align:center;margin-top:10px"></div></div></div>
+
+</main>
+<script>
+let menus=JSON.parse(localStorage.getItem('v3_menus')||'null')||[
+{nama:'Kopi Susu Aren',harga:12000,modal:5000,resep:{susu:150,gula_aren:20,es:100}},
+{nama:'Kopi Hitam',harga:8000,modal:2500,resep:{kopi:15,air:150}},
+{nama:'Americano',harga:10000,modal:3000,resep:{kopi:18,air:200}},
+{nama:'Teh Manis',harga:5000,modal:1200,resep:{teh:5,gula:20,es:150}}
+];
+let stok=JSON.parse(localStorage.getItem('v3_stok')||'null')||[{nama:'susu',qty:5000,sat:'ml'},{nama:'gula_aren',qty:2000,sat:'gr'},{nama:'kopi',qty:1000,sat:'gr'},{nama:'es',qty:10000,sat:'gr'}];
+let sales=JSON.parse(localStorage.getItem('v3_sales')||'[]');let keluar=JSON.parse(localStorage.getItem('v3_keluar')||'[]');let members=JSON.parse(localStorage.getItem('v3_members')||'[]');let hutang=JSON.parse(localStorage.getItem('v3_hutang')||'[]');let qrisImg=localStorage.getItem('v3_qris')||'';let target=500000;let cart=[];let shiftNow=localStorage.getItem('v3_shift')||'Owner';
+function save(){localStorage.setItem('v3_menus',JSON.stringify(menus));localStorage.setItem('v3_stok',JSON.stringify(stok));localStorage.setItem('v3_sales',JSON.stringify(sales));localStorage.setItem('v3_keluar',JSON.stringify(keluar));localStorage.setItem('v3_members',JSON.stringify(members));localStorage.setItem('v3_hutang',JSON.stringify(hutang));}
+function p(id){['kasir','menu','stok','member','hutang','keluar','lap','qris'].forEach(x=>document.getElementById(x).style.display='none');document.getElementById(id).style.display='block';document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));document.getElementById('t-'+id).classList.add('on');if(id=='lap')renderLap();}
+function parseResep(str){let o={};if(!str)return o;str.split(',').forEach(s=>{let [k,v]=s.split(':');if(k&&v)o[k.trim().toLowerCase()]=parseFloat(v);});return o;}
+function renderAll(){let g=document.getElementById('menuGrid');g.innerHTML='';menus.forEach((m,i)=>{g.innerHTML+=`<div class="m" onclick="addCart(${i})"><b>${m.nama}</b><br>Rp ${m.harga}</div>`});let tm=document.getElementById('tblMenu');tm.innerHTML='';menus.forEach((m,i)=>{tm.innerHTML+=`<tr><td>${m.nama}</td><td>${m.harga}</td><td class="small">${JSON.stringify(m.resep)}</td><td><button onclick="menus.splice(${i},1);save();renderAll()">x</button></td></tr>`});let ts=document.getElementById('tblStok');ts.innerHTML='';stok.forEach((s,i)=>{let st=s.qty<500?'<span style="color:#ff6666">Menipis!</span>':'Aman';ts.innerHTML+=`<tr><td>${s.nama}</td><td>${s.qty} ${s.sat}</td><td>${st}</td><td><button onclick="stok.splice(${i},1);save();renderAll()">x</button></td></tr>`});let tbM=document.getElementById('tblMember');tbM.innerHTML='';members.forEach((m,i)=>{let gratis=m.poin>=10?'<b style="color:#c7f167">GRATIS 1!</b>':m.poin+'/10';tbM.innerHTML+=`<tr><td>${m.nama}</td><td>${m.poin}</td><td>${gratis}</td><td><button onclick="members[i].poin=0;save();renderAll()">Reset</button></td></tr>`});document.getElementById('shiftTxt').innerText=shiftNow;document.getElementById('memberTxt').innerText=members.length;
+let om=sales.reduce((a,b)=>a+b.total,0);document.getElementById('targetTxt').innerText='Rp '+om.toLocaleString()+' / 500k';document.getElementById('targetBar').style.width=Math.min(100,om/target*100)+'%';
+let count={};sales.forEach(s=>{s.items.split(',').forEach(it=>{let n=it.trim();if(n)count[n]=(count[n]||0)+1});});let max=Object.entries(count).sort((a,b)=>b[1]-a[1])[0];document.getElementById('larisTxt').innerText=max?max[0]:'-';
+if(qrisImg)document.getElementById('qrisPreview').innerHTML=`<img src="${qrisImg}" style="max-width:250px;border-radius:12px">`;
+}
+function addCart(i){let f=cart.find(c=>c.i==i);if(f)f.qty++;else cart.push({i,qty:1});renderCart();}
+function renderCart(){let el=document.getElementById('cart');if(cart.length==0){el.innerHTML='Kosong';}else{el.innerHTML='';let tot=0;cart.forEach((c,idx)=>{let m=menus[c.i];let sub=m.harga*c.qty;tot+=sub;el.innerHTML+=`${m.nama} x${c.qty}=Rp ${sub} <button onclick="cart.splice(${idx},1);renderCart()">x</button><br>`});document.getElementById('tot').innerText='Rp '+tot;let bayar=parseInt(document.getElementById('bayar').value||0);document.getElementById('kembali').innerText=bayar? 'Kembali Rp '+(bayar-tot):'';}}
+function gantiShift(){shiftNow=document.getElementById('shift').value;localStorage.setItem('v3_shift',shiftNow);renderAll();}
+function prosesBayar(){if(cart.length==0)return alert('Kosong');let tot=0,mod=0;let items='';let resepTotal={};cart.forEach(c=>{let m=menus[c.i];tot+=m.harga*c.qty;mod+=m.modal*c.qty;items+=m.nama+' x'+c.qty+', ';Object.entries(m.resep||{}).forEach(([k,v])=>{resepTotal[k]=(resepTotal[k]||0)+v*c.qty;});});
+let bayar=parseInt(document.getElementById('bayar').value||0);let metode=document.getElementById('metode').value;let cust=document.getElementById('cust').value||'-';
+if(metode=='Tunai'&&bayar<tot)return alert('Uang kurang');let member=members.find(x=>x.nama.toLowerCase()==cust.toLowerCase());if(member){member.poin+=cart.reduce((a,b)=>a+b.qty,0);if(metode=='Member Gratis'){if(member.poin<10)return alert('Poin belum 10');member.poin-=10;tot=0;}}
+if(metode=='Bon/Hutang'){hutang.push({waktu:new Date().toLocaleString(),nama:cust,jumlah:tot,lunas:false});}
+sales.push({waktu:new Date().toLocaleString(),cust,metode,items,total:tot,modal:mod,shift:shiftNow});
+Object.entries(resepTotal).forEach(([k,v])=>{let s=stok.find(x=>x.nama==k);if(s)s.qty-=v;});
+save();let strukEl=document.getElementById('struk');strukEl.style.display='block';strukEl.innerHTML=`<b>182KOPI</b><br>${new Date().toLocaleString()}<br>Shift:${shiftNow}<br>Pelanggan:${cust}<br>Metode:${metode}<br>----------------<br>${items}<br>Total: Rp ${tot}<br>Bayar: Rp ${bayar}<br>Kembali: Rp ${bayar-tot}<br>----------------<br>Terima kasih!`;
+cart=[];document.getElementById('bayar').value='';renderCart();renderAll();alert('Sukses!');}
+function addMenu(){let n=document.getElementById('mN').value;let h=parseInt(document.getElementById('mH').value);let mo=parseInt(document.getElementById('mM').value||0);let r=parseResep(document.getElementById('mR').value);if(!n||!h)return alert('Isi nama harga');menus.push({nama:n,harga:h,modal:mo,resep:r});save();renderAll();}
+function addStok(){let n=document.getElementById('sN').value.toLowerCase();let q=parseFloat(document.getElementById('sQ').value);let s=document.getElementById('sS').value;let ex=stok.find(x=>x.nama==n);if(ex)ex.qty+=q;else stok.push({nama:n,qty:q,sat:s});save();renderAll();}
+function addMember(){let n=document.getElementById('memNama').value;if(!n)return;members.push({nama:n,poin:0});save();renderAll();}
+function addKeluar(){let n=document.getElementById('kN').value;let b=parseInt(document.getElementById('kB').value);if(!n||!b)return;keluar.push({waktu:new Date().toLocaleString(),nama:n,biaya:b});save();renderLap();}
+function renderLap(){let om=sales.reduce((a,b)=>a+b.total,0);let mo=sales.reduce((a,b)=>a+b.modal,0);let ke=keluar.reduce((a,b)=>a+b.biaya,0);document.getElementById('lapOm').innerText='Rp '+om.toLocaleString();document.getElementById('lapMod').innerText='Rp '+mo.toLocaleString();document.getElementById('lapKel').innerText='Rp '+ke.toLocaleString();document.getElementById('lapLab').innerText='Rp '+(om-mo-ke).toLocaleString();
+let tl=document.getElementById('tblLap');tl.innerHTML='';sales.slice().reverse().forEach(s=>{tl.innerHTML+=`<tr><td>${s.waktu}</td><td>${s.cust}</td><td>${s.metode}</td><td>${s.total}</td></tr>`});
+let tk=document.getElementById('tblKeluar');tk.innerHTML='';keluar.slice().reverse().forEach(k=>{tk.innerHTML+=`<tr><td>${k.waktu}</td><td>${k.nama}</td><td>${k.biaya}</td></tr>`});
+let th=document.getElementById('tblHutang');th.innerHTML='';hutang.slice().reverse().forEach((h,i)=>{th.innerHTML+=`<tr><td>${h.waktu}</td><td>${h.nama}</td><td>${h.jumlah}</td><td><button onclick="hutang[${hutang.length-1-i}].lunas=true;save();renderLap()">Lunas</button> ${h.lunas?'✓':''}</td></tr>`});
+let ctx=document.getElementById('chart').getContext('2d');ctx.clearRect(0,0,320,150);ctx.fillStyle='#c7f167';sales.slice(-7).forEach((s,i)=>{let h=s.total/2000;ctx.fillRect(i*40+10,150-h,30,h);});}
+function exportCSV(){let csv='waktu,cust,metode,items,total,modal,shift\n'+sales.map(s=>`"${s.waktu}","${s.cust}","${s.metode}","${s.items}",${s.total},${s.modal},"${s.shift}"`).join('\n');let blob=new Blob([csv],{type:'text/csv'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='182kopi-v3.csv';a.click();}
+document.getElementById('bayar').addEventListener('input',renderCart);
+document.getElementById('qrisFile').addEventListener('change',function(e){let r=new FileReader();r.onload=function(ev){qrisImg=ev.target.result;localStorage.setItem('v3_qris',qrisImg);renderAll();};r.readAsDataURL(e.target.files[0]);});
+renderAll();renderCart();renderLap();
+</script></body></html>
